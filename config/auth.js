@@ -1,4 +1,6 @@
 module.exports = {
-    secret: 'Testasofnow'
+    secret: 'Testasofnow',
+    expiresIn:"1h"
   };
+
   
