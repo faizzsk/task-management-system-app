@@ -1,7 +1,20 @@
+const { validationResult } = require("express-validator");
 const Task = require("../models/Task");
 const taskService = require("../services/task.service");
+const { validateTaskCreation } = require("../validation/task.validation");
 
 exports.createTask = async (req, res) => {
+  console.log("--TaskController--createTask--");
+
+  await Promise.all(
+    validateTaskCreation.map((validation) => validation.run(req))
+  );
+
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   try {
     const userId = req?.user?.userId;
     const taskData = { ...req.body, user: userId, createdBy: userId };
@@ -18,6 +31,8 @@ exports.createTask = async (req, res) => {
 };
 
 exports.getTaskById = async (req, res) => {
+  console.log("--TaskController--getTaskById--");
+
   try {
     const userId = req.user.userId;
     const taskId = req.params.id;
@@ -30,6 +45,8 @@ exports.getTaskById = async (req, res) => {
 };
 
 exports.updateTaskById = async (req, res) => {
+  console.log("--TaskController--updateTaskById--");
+
   try {
     const userId = req.user.userId;
     const taskId = req.params.id;
@@ -47,30 +64,32 @@ exports.updateTaskById = async (req, res) => {
   }
 };
 
-
 exports.deleteTaskById = async (req, res) => {
-    try {
-      const userId = req.user.userId;
-      const taskId = req.params.id;
+  console.log("--TaskController--deleteTaskById--");
 
-      await taskService.deleteTaskById(userId,taskId)
-      res.status(200).json({message:"Task deleted successfully"});
-    } catch (error) {
-      res.status(500).json({ error: 'Failed to delete task' });
-    }
-  };
+  try {
+    const userId = req.user.userId;
+    const taskId = req.params.id;
 
+    await taskService.deleteTaskById(userId, taskId);
+    res.status(200).json({ message: "Task deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Failed to delete task" });
+  }
+};
 
-  exports.getAllTasks = async (req, res) => {
-    try {
-      const userId = req.user.userId; // Extract userId from JWT payload
-      //const { sortBy, sortOrder, search, page, limit } = req.query;
-      const query=req?.query
-    const tasks=  await taskService.getAllTasks(userId,query)
-  
-      res.status(200).json(tasks);
-    } catch (error) {
-        console.log("err",error);
-      res.status(500).json({ error: 'Failed to fetch tasks' });
-    }
-  };
+exports.getAllTasks = async (req, res) => {
+  console.log("--TaskController--getAllTasks--");
+
+  try {
+    const userId = req.user.userId; // Extract userId from JWT payload
+    //const { sortBy, sortOrder, search, page, limit } = req.query;
+    const query = req?.query;
+    const tasks = await taskService.getAllTasks(userId, query);
+
+    res.status(200).json(tasks);
+  } catch (error) {
+    console.log("err", error);
+    res.status(500).json({ error: "Failed to fetch tasks" });
+  }
+};
