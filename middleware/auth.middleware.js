@@ -1,8 +1,9 @@
 const jwt = require('jsonwebtoken');
 const authConfig = require('../config/auth');
 
-// Middleware function to verify JWT token
 exports.verifyToken = async (req, res, next) => {
+
+  console.log("--Middleware--Verify Token");
   const token = req.headers.authorization;
 console.log(token);
   if (!token) {
@@ -13,7 +14,7 @@ console.log(token);
     console.log("im ");
     const decoded =  jwt.verify(token.replace("Bearer ",""), authConfig.secret);
     console.log("dec",decoded);
-    req.user = decoded; // Add decoded user information to request object
+    req.user = decoded; 
     next();
   } catch (err) {
     console.log(err,"err");

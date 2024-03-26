@@ -1,16 +1,26 @@
-
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const authConfig = require("../config/auth");
 
 exports.registerUser = async (username, password) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const user = new User({ username, password: hashedPassword });
-  await user.save();
+  console.log("-- Auth Service --registerUser ");
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({
+      username: username.toLowerCase(),
+      password: hashedPassword,
+    });
+    await user.save();
+  } catch (error) {
+    throw new Error(error);
+  }
 };
 
 exports.loginUser = async (username, password) => {
+  console.log("-- Auth Service --loginUser ");
+
   const user = await User.findOne({ username });
   if (!user) {
     throw new Error("Invalid username ");
@@ -25,4 +35,3 @@ exports.loginUser = async (username, password) => {
   });
   return token;
 };
-

@@ -1,12 +1,16 @@
 const Task = require("../models/Task");
 
 exports.createTask = async (taskData) => {
+  console.log("-- Task Service --createTask ");
+
   const task = new Task(taskData);
 
   await task.save();
 };
 
 exports.getTaskById = async (userId, taskId) => {
+  console.log("-- Task Service --getTaskById ");
+
   const task = await Task.findOne({ _id: taskId, user: userId });
   if (!task) {
     throw new Error("Task not found");
@@ -15,9 +19,10 @@ exports.getTaskById = async (userId, taskId) => {
 };
 
 exports.updateTaskById = async (userId, taskId, updateData) => {
+  console.log("-- Task Service --updateTaskById ");
+
   try {
-    //   const userId = req.user.userId;
-    //   const taskId = req.params.id;
+   
     const updatedTask = await Task.findOneAndUpdate(
       { _id: taskId, user: userId },
       { ...updateData, updatedBy: userId },
@@ -35,8 +40,8 @@ exports.updateTaskById = async (userId, taskId, updateData) => {
 
 exports.deleteTaskById = async (userId, taskId) => {
   try {
-    //   const userId = req.user.userId;
-    //   const taskId = req.params.id;
+    console.log("-- Task Service --deleteTaskById ");
+
     const deletedTask = await Task.findOneAndUpdate(
       { _id: taskId, user: userId },
       { isActive: false, deletedBy: userId }
@@ -54,11 +59,13 @@ exports.deleteTaskById = async (userId, taskId) => {
 // Pagination with sorting, searching, pagination
 
 exports.getAllTasks = async (userId, query) => {
+  console.log("-- Task Service --getAllTasks ");
+
   try {
     const { sortBy, sortOrder, search, page = 1, limit = 10 } = query;
     const pipeline = [];
 
-    pipeline.push({ $match: { createdBy: userId } })
+    pipeline.push({ $match: { createdBy: userId } });
 
     if (search) {
       pipeline.push({
@@ -67,7 +74,6 @@ exports.getAllTasks = async (userId, query) => {
             { title: { $regex: search, $options: "i" } },
             { description: { $regex: search, $options: "i" } },
             { status: { $regex: search, $options: "i" } },
-
           ],
         },
       });
@@ -83,7 +89,7 @@ exports.getAllTasks = async (userId, query) => {
       pipeline.push({ $skip: (page - 1) * limit });
       pipeline.push({ $limit: parseInt(limit) });
     }
-    console.log("pipeline",pipeline);
+    console.log("pipeline", pipeline);
     // Build aggregation pipeline stages based on query parameters
     //   const pipeline = [
     //     { $match: { user: userId,isActive:true } },
@@ -105,25 +111,25 @@ exports.getAllTasks = async (userId, query) => {
 
     const tasks = await Task.aggregate(pipeline);
 
-  //  const total_pages = Math.ceil(tasks.length / limit);
+    //  const total_pages = Math.ceil(tasks.length / limit);
     const total_pages = Math.ceil(tasks.length / limit);
 
-    // Ensure current page does not exceed total pages
+    // current page 
     const current_page = Math.min(page, total_pages);
 
-    // Prepare response object with pagination information
+    
     const response = {
       data: {
         tasks,
         pagination: {
           total_pages,
-          current_page: current_page,//parseInt(page),
-          per_page: parseInt(limit)
-        }
-      }
+          current_page: current_page, //parseInt(page),
+          per_page: parseInt(limit),
+        },
+      },
     };
 
-    console.log("task",response);
+    console.log("task", response);
     return response;
   } catch (error) {
     console.log("error", error);

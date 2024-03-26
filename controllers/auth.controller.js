@@ -2,26 +2,45 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const authConfig = require("../config/auth");
-const authService = require('../services/auth.service');
+const authService = require("../services/auth.service");
+const { validateRegistration, validateLogin } = require("../validation/auth.validation");
+const { validationResult } = require("express-validator");
 
 exports.register = async (req, res) => {
+    console.log("--AuthController--Register--");
+    
+    //Validation
+    await Promise.all(validateRegistration.map(validation => validation.run(req)));
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    
+
+
   try {
+    
     const { username, password } = req.body;
-
     await authService.registerUser(username, password);
-
-    // const hashPassword = await bcrypt.hash(password, 10);
-    // const user = new User({ username, password: hashPassword });
-    // await user.save();
-
     res.status(201).json({ message: "User registered Succesfully" });
   } catch (error) {
-    console.log("error", error);
+    console.error("error", error);
     res.status(500).json({ error: "Failed to register user" });
   }
 };
 
+
 exports.login = async (req, res) => {
+   console.log("--AuthController--Login--");
+
+    await Promise.all(validateLogin.map(validation => validation.run(req)));
+
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
   try {
     const { username, password } = req.body;
     const token = await authService.loginUser(username, password);
@@ -45,17 +64,18 @@ exports.login = async (req, res) => {
 
     res.status(200).json({ token });
   } catch (error) {
-    console.log("error",error);
-    res.status(500).json({ error: "Failed to login",msg:error });
+    console.error("error", error);
+    res.status(500).json({ error: "Failed to login", msg: error });
   }
 };
 
 exports.logout = async (req, res) => {
-  try {
 
+  console.log("--AuthController--Logout--");
+
+  try {
     res.clearCookie("jwtToken");
     res.status(200).json({ message: "Logout successful" });
-    
   } catch (error) {
     res.status(500).json({ error: "Something went wrong" });
   }
