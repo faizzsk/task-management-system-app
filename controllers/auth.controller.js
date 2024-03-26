@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const User = require("../models/User");
 const jwt = require("jsonwebtoken");
 const authConfig = require("../config/auth");
+const authService = require('../services/auth.service');
 
 exports.register = async (req, res) => {
   try {
@@ -44,7 +45,8 @@ exports.login = async (req, res) => {
 
     res.status(200).json({ token });
   } catch (error) {
-    res.status(500).json({ error: "Failed to login" });
+    console.log("error",error);
+    res.status(500).json({ error: "Failed to login",msg:error });
   }
 };
 
