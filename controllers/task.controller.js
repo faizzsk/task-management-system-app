@@ -3,6 +3,7 @@ const Task = require("../models/Task");
 const taskService = require("../services/task.service");
 const { validateTaskCreation } = require("../validation/task.validation");
 
+// Create Task
 exports.createTask = async (req, res) => {
   console.log("--TaskController--createTask--");
 
@@ -30,12 +31,14 @@ exports.createTask = async (req, res) => {
   }
 };
 
+
+// Get Task By Id
 exports.getTaskById = async (req, res) => {
   console.log("--TaskController--getTaskById--");
 
   try {
-    const userId = req.user.userId;
-    const taskId = req.params.id;
+    const userId = req?.user?.userId;
+    const taskId = req?.params?.id;
 
     const task = await taskService.getTaskById(userId, taskId);
     res.status(200).json(task);
@@ -64,6 +67,7 @@ exports.updateTaskById = async (req, res) => {
   }
 };
 
+// Delete By ID
 exports.deleteTaskById = async (req, res) => {
   console.log("--TaskController--deleteTaskById--");
 
@@ -78,6 +82,7 @@ exports.deleteTaskById = async (req, res) => {
   }
 };
 
+// Get All Task
 exports.getAllTasks = async (req, res) => {
   console.log("--TaskController--getAllTasks--");
 

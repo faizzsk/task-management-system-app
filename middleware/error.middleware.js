@@ -1,5 +1,5 @@
 function errorHandler(err, req, res, next) {
-    console.log("--Middleware--Error Handler");
+    console.log("--Middleware--Error Handler--");
 
     console.error(err.stack); 
 
