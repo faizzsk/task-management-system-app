@@ -24,7 +24,7 @@ exports.updateTaskById = async (userId, taskId, updateData) => {
   try {
    
     const updatedTask = await Task.findOneAndUpdate(
-      { _id: taskId, user: userId },
+      { _id: taskId, user: userId,isActive:true },
       { ...updateData, updatedBy: userId },
       { new: true }
     );
@@ -43,7 +43,7 @@ exports.deleteTaskById = async (userId, taskId) => {
     console.log("-- Task Service --deleteTaskById ");
 
     const deletedTask = await Task.findOneAndUpdate(
-      { _id: taskId, user: userId },
+      { _id: taskId, user: userId,isActive:true },
       { isActive: false, deletedBy: userId }
     );
     if (!deletedTask) {

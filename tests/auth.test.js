@@ -3,14 +3,14 @@ const request = require('supertest');
 const app = require('../index'); 
 const mongoose = require('mongoose');
 const User = require('../models/User');
-
+//Not working
 jest.mock('../services/auth.service', () => ({
   registerUser: jest.fn(),
 }));
 describe('Authentication API Tests', () => {
   // MongoDB setup
   beforeAll(async () => {
-    await mongoose.connect('mongodb://localhost/task_management', {
+    await mongoose.connect('mongodb://localhost:27017/task_management', {
       useNewUrlParser: true,
     });
   });

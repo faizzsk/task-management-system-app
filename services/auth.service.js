@@ -21,7 +21,7 @@ exports.registerUser = async (username, password) => {
 exports.loginUser = async (username, password) => {
   console.log("-- Auth Service --loginUser ");
 
-  const user = await User.findOne({ username });
+  const user = await User.findOne({ username:username.toLowerCase() });
   if (!user) {
     throw new Error("Invalid username ");
   }
