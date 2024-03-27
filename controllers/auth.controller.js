@@ -1,7 +1,3 @@
-const bcrypt = require("bcryptjs");
-const User = require("../models/User");
-const jwt = require("jsonwebtoken");
-const authConfig = require("../config/auth");
 const authService = require("../services/auth.service");
 const {
   validateRegistration,
@@ -10,6 +6,8 @@ const {
 const { validationResult } = require("express-validator");
 const BlacklistedToken = require("../models/Token");
 
+
+// Register
 exports.register = async (req, res) => {
   console.log("--AuthController--Register--");
 
@@ -33,9 +31,10 @@ exports.register = async (req, res) => {
   }
 };
 
+// Login
 exports.login = async (req, res) => {
   console.log("--AuthController--Login--");
-
+  //Validation
   await Promise.all(validateLogin.map((validation) => validation.run(req)));
 
   const errors = validationResult(req);
@@ -62,6 +61,7 @@ exports.login = async (req, res) => {
     //   expiresIn: authConfig.expiresIn,
     // });
 
+    //setting cookie
     res.cookie("jwtToken", token, { httpOnly: false, secure: false });
 
     res.status(200).json({ token });
@@ -71,6 +71,8 @@ exports.login = async (req, res) => {
   }
 };
 
+
+// Logout
 exports.logout = async (req, res) => {
   console.log("--AuthController--Logout--");
 
@@ -78,12 +80,13 @@ exports.logout = async (req, res) => {
     // const token = req?.headers?.authorization;
     const token = req?.cookies?.jwtToken;
     console.log("token", token);
+    // Adding token to blacklist
     const blacklistedToken = new BlacklistedToken({
-      token: token, // Assuming you have the token available in req.token
+      token: token, 
     });
 
     await blacklistedToken.save();
-
+    //clear cookie
     res.clearCookie("jwtToken");
     res.status(200).json({ message: "Logout successful" });
   } catch (error) {

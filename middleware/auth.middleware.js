@@ -3,7 +3,7 @@ const authConfig = require("../config/auth");
 const BlacklistedToken = require("../models/Token");
 
 exports.verifyToken = async (req, res, next) => {
-  console.log("--Middleware--Verify Token");
+  console.log("--Middleware--Verify Token--");
   const token = req.headers.authorization;
   console.log(token);
   if (!token) {

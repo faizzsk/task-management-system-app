@@ -1,5 +1,7 @@
 const Task = require("../models/Task");
 
+
+// Create Task
 exports.createTask = async (taskData) => {
   console.log("-- Task Service --createTask ");
 
@@ -8,6 +10,7 @@ exports.createTask = async (taskData) => {
   await task.save();
 };
 
+// Get Task By Id
 exports.getTaskById = async (userId, taskId) => {
   console.log("-- Task Service --getTaskById ");
 
@@ -18,6 +21,7 @@ exports.getTaskById = async (userId, taskId) => {
   return task;
 };
 
+// Update by Id
 exports.updateTaskById = async (userId, taskId, updateData) => {
   console.log("-- Task Service --updateTaskById ");
 
@@ -38,6 +42,8 @@ exports.updateTaskById = async (userId, taskId, updateData) => {
   }
 };
 
+// Delete by Id
+// Soft delete
 exports.deleteTaskById = async (userId, taskId) => {
   try {
     console.log("-- Task Service --deleteTaskById ");
@@ -49,15 +55,14 @@ exports.deleteTaskById = async (userId, taskId) => {
     if (!deletedTask) {
       throw new Error("Task not found");
     }
-    // res.status(200).json(deletedTask);
   } catch (error) {
-    // res.status(500).json({ error: 'Failed to delete task' });
+
     throw new Error("Failed to delete task");
   }
 };
 
+// Get All Task
 // Pagination with sorting, searching, pagination
-
 exports.getAllTasks = async (userId, query) => {
   console.log("-- Task Service --getAllTasks ");
 
@@ -65,15 +70,16 @@ exports.getAllTasks = async (userId, query) => {
     const { sortBy, sortOrder, search, page = 1, limit = 10 } = query;
     const pipeline = [];
 
+    // Match
     pipeline.push({ $match: { createdBy: userId } });
 
     if (search) {
       pipeline.push({
         $match: {
           $or: [
-            { title: { $regex: search, $options: "i" } },
-            { description: { $regex: search, $options: "i" } },
-            { status: { $regex: search, $options: "i" } },
+            { title: { $regex: search, $options: "i" } }, // search by title
+            { description: { $regex: search, $options: "i" } }, // search by description
+            { status: { $regex: search, $options: "i" } }, // status
           ],
         },
       });
