@@ -92,7 +92,8 @@ exports.getAllTasks = async (userId, query) => {
     }
 
     if (page && limit) {
-      pipeline.push({ $skip: (page - 1) * limit });
+      const skip = (page - 1) * limit;
+      pipeline.push({ $skip: parseInt(skip) });
       pipeline.push({ $limit: parseInt(limit) });
     }
     console.log("pipeline", pipeline);
@@ -115,21 +116,25 @@ exports.getAllTasks = async (userId, query) => {
     //     });
     //   }
 
+    // Pagination
+
     const tasks = await Task.aggregate(pipeline);
 
+    const totalTasksCount = await Task.countDocuments({ createdBy: userId });
+
+    const totalPages = Math.ceil(totalTasksCount / limit);
+
     //  const total_pages = Math.ceil(tasks.length / limit);
-    const total_pages = Math.ceil(tasks.length / limit);
 
-    // current page 
-    const current_page = Math.min(page, total_pages);
+    // current page
+    //    const current_page = Math.min(page, total_pages);
 
-    
     const response = {
       data: {
         tasks,
         pagination: {
-          total_pages,
-          current_page: current_page, //parseInt(page),
+          totalPages: totalPages,
+          current_page: page, //parseInt(page),
           per_page: parseInt(limit),
         },
       },
